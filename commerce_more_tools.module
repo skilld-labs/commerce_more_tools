@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Common hook implementations for commerce_more_tools module.
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ *
+ * Used to control access to product variations.
+ */
+function commerce_more_tools_commerce_product_variation_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  if ($account->id() == $entity->getProduct()->getOwnerId() && $operation != 'view') {
+    $variation_type_id = $entity->bundle();
+    switch ($operation) {
+      case 'create':
+        return AccessResult::allowedIfHasPermission($account, "own product create $variation_type_id product_variation");
+
+      case 'update':
+        return AccessResult::allowedIfHasPermission($account, "own product edit own $variation_type_id product_variation")
+          ->orIf(AccessResult::allowedIfHasPermission($account, "own product edit any $variation_type_id product_variation"));
+
+      case 'delete':
+        return AccessResult::allowedIfHasPermission($account, "own product delete own $variation_type_id product_variation")
+          ->orIf(AccessResult::allowedIfHasPermission($account, "own product delete any $variation_type_id product_variation"));
+
+      case 'duplicate':
+        return AccessResult::allowedIfHasPermission($account, "own product duplicate $variation_type_id product_variation");
+
+      default:
+        return AccessResult::forbidden();
+    }
+  }
+  elseif ($operation == 'view') {
+    return AccessResult::allowed();
+  }
+  else {
+    return AccessResult::neutral();
+  }
+}

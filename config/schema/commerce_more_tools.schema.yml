@@ -1,0 +1,10 @@
+commerce.commerce_condition.plugin.order_seller_role:
+  type: commerce_condition_configuration
+  mapping:
+    roles:
+      type: sequence
+      label: 'Roles'
+      orderby: value
+      sequence:
+        type: string
+        label: 'Role'
