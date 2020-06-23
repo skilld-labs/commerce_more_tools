@@ -1,0 +1,10 @@
+{
+  "name": "drupal/commerce_more_tools",
+  "type": "drupal-module",
+  "description": "Provides more useful tools for Drupal Commerce sites. Useful for marketplaces.",
+  "homepage": "https://github.com/skilld-labs/commerce_more_tools",
+  "license": "GPL-2.0+",
+  "require": {
+    "drupal/commerce": "~2.0"
+  }
+}

@@ -3,3 +3,6 @@ type: module
 description: 'Provides additional/useful commerce tools.'
 package: Commerce
 core_version_requirement: ^8.7.7 || ^9
+dependencies:
+  - commerce:commerce_product
+  - commerce:commerce_store

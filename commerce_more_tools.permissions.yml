@@ -8,3 +8,4 @@ access own commerce_product overview:
 
 permission_callbacks:
   - \Drupal\commerce_more_tools\ProductVariationPermissions::productVariationTypePermissions
+  - \Drupal\commerce_more_tools\OrderTypePermissions::orderTypePermissions
