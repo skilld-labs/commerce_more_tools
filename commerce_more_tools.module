@@ -43,3 +43,27 @@ function commerce_more_tools_commerce_product_variation_access(EntityInterface $
     return AccessResult::neutral();
   }
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ *
+ * Used to control access to commerce orders.
+ */
+function commerce_more_tools_commerce_order_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  if ($entity->getStore()->getOwner()->id() == $account->id()) {
+    $order_type = $entity->bundle();
+    switch ($operation) {
+      case 'view':
+        return AccessResult::allowedIfHasPermission($account, "own store view order type $order_type");
+
+      case 'update':
+        return AccessResult::allowedIfHasPermission($account, "own store edit order type $order_type");
+
+      case 'delete':
+        return AccessResult::allowedIfHasPermission($account, "own store delete order type $order_type");
+    }
+  }
+  else {
+    return AccessResult::neutral();
+  }
+}

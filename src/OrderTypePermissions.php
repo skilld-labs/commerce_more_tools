@@ -35,6 +35,9 @@ class OrderTypePermissions {
     $type_params = ['%type_name' => $type->label()];
 
     return [
+      "own store view order type $type_id" => [
+        'title' => $this->t('[Own commerce store] %type_name: View commerce order', $type_params),
+      ],
       "own store edit order type $type_id" => [
         'title' => $this->t('[Own commerce store] %type_name: Edit commerce order', $type_params),
       ],
