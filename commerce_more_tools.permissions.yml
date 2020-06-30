@@ -1,10 +1,14 @@
-reference any store type:
-  title: 'Reference any store type'
-  description: 'Allow user to pick any store type for entity reference fields.'
+reference any store:
+  title: 'Reference any store'
+  description: 'Allow user to pick any store for entity reference fields into the commerce product or other forms.'
 
 access own commerce_product overview:
   title: 'Access own commerce product overview page'
   description: 'Allow users to see list of product variations on their own products.'
+
+own store manage payments:
+  title: 'Manage payments in own store'
+  description: 'Allow to manage order payments made into the own store.'
 
 permission_callbacks:
   - \Drupal\commerce_more_tools\ProductVariationPermissions::productVariationTypePermissions

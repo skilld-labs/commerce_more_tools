@@ -44,6 +44,9 @@ class OrderTypePermissions {
       "own store delete order type $type_id" => [
         'title' => $this->t('[Own commerce store] %type_name: Delete commerce order', $type_params),
       ],
+      "own store reassign order type $type_id" => [
+        'title' => $this->t('[Own commerce store] %type_name: Reassign commerce order', $type_params),
+      ],
     ];
   }
 

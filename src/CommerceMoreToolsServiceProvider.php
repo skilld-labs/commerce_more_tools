@@ -18,20 +18,22 @@ class CommerceMoreToolsServiceProvider extends ServiceProviderBase {
    */
   public function alter(ContainerBuilder $container) {
     // Alter access check to /product/{commerce_product}/variations page.
-    $definition = $container->getDefinition('access_check.product_variation_collection');
-    if ($definition) {
+    if ($definition = $container->getDefinition('access_check.product_variation_collection')) {
       $definition->setClass('Drupal\commerce_more_tools\Access\ProductVariationCollectionAccessCheck');
       $definition->setArguments([
         new Reference('entity_type.manager'),
       ]);
     }
     // Alter access check to /product/{commerce_product}/variations/add page.
-    $definition = $container->getDefinition('access_check.product_variation_create');
-    if ($definition) {
+    if ($definition = $container->getDefinition('access_check.product_variation_create')) {
       $definition->setClass('Drupal\commerce_more_tools\Access\ProductVariationCreateAccessCheck');
       $definition->setArguments([
         new Reference('entity_type.manager'),
       ]);
+    }
+    // Alter access check to /admin/commerce/orders/{commerce_order}/payments/{commerce_payment}/operation/{operation} page.
+    if ($definition = $container->getDefinition('access_check.commerce_payment.operation')) {
+      $definition->setClass('Drupal\commerce_more_tools\Access\PaymentOperationAccessCheck');
     }
   }
 

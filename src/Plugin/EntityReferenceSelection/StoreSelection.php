@@ -28,7 +28,7 @@ class StoreSelection extends DefaultSelection {
     if ($this->currentUser->hasPermission($entity_type->getAdminPermission()) || $this->currentUser->hasPermission('view commerce_store')) {
       return $query;
     }
-    if (!$this->currentUser->hasPermission('reference any store type')) {
+    if (!$this->currentUser->hasPermission('reference any store')) {
       $query->condition('uid', $this->currentUser->id());
     }
 

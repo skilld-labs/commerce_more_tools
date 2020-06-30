@@ -8,6 +8,7 @@
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_ENTITY_TYPE_access().
@@ -36,9 +37,6 @@ function commerce_more_tools_commerce_product_variation_access(EntityInterface $
         return AccessResult::forbidden();
     }
   }
-  elseif ($operation == 'view') {
-    return AccessResult::allowed();
-  }
   else {
     return AccessResult::neutral();
   }
@@ -50,20 +48,67 @@ function commerce_more_tools_commerce_product_variation_access(EntityInterface $
  * Used to control access to commerce orders.
  */
 function commerce_more_tools_commerce_order_access(EntityInterface $entity, $operation, AccountInterface $account) {
-  if ($entity->getStore()->getOwner()->id() == $account->id()) {
-    $order_type = $entity->bundle();
-    switch ($operation) {
-      case 'view':
-        return AccessResult::allowedIfHasPermission($account, "own store view order type $order_type");
+  // Seems there's a bug in upstream. Let's check store before any operation.
+  if ($store = $entity->getStore()) {
+    if ($store->getOwner()->id() == $account->id()) {
+      $order_type = $entity->bundle();
+      switch ($operation) {
+        case 'view':
+          return AccessResult::allowedIfHasPermission($account, "own store view order type $order_type");
 
-      case 'update':
-        return AccessResult::allowedIfHasPermission($account, "own store edit order type $order_type");
+        case 'update':
+          return AccessResult::allowedIfHasPermission($account, "own store edit order type $order_type");
 
-      case 'delete':
-        return AccessResult::allowedIfHasPermission($account, "own store delete order type $order_type");
+        case 'delete':
+          return AccessResult::allowedIfHasPermission($account, "own store delete order type $order_type");
+      }
     }
   }
   else {
     return AccessResult::neutral();
+  }
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function commerce_more_tools_entity_operation(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'commerce_order') {
+    $operations = [];
+    // Needed variables.
+    $store_owner = $entity->getStore()->getOwner();
+    $current_user = \Drupal::currentUser();
+    // Let's validate several cases for desired operations.
+    if ($store_owner->id() == $current_user->id() && $current_user->hasPermission('own store manage payments')) {
+      $operations['payments'] = [
+        'title' => t('Payments'),
+        'url' => Url::fromRoute('entity.commerce_payment.collection', [
+          'commerce_order' => $entity->id(),
+        ]),
+        'weight' => 50,
+      ];
+    }
+    if (($store_owner->id() == $current_user->id() && $current_user->hasPermission('own store manage payments')) || $current_user->hasPermission('administer commerce_payment')) {
+      $operations['payment_create'] = [
+        'title' => t('Add payment'),
+        'url' => Url::fromRoute('entity.commerce_payment.add_form', [
+          'commerce_order' => $entity->id(),
+        ]),
+        'weight' => 55,
+      ];
+    }
+    return $operations;
+  }
+}
+
+/**
+ * Implements hook_entity_operation_alter().
+ */
+function commerce_more_tools_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'commerce_order' && $entity->getStore()->getOwner()->id() == \Drupal::currentUser()->id()) {
+    $order_type = $entity->bundle();
+    if (!\Drupal::currentUser()->hasPermission("own store reassign order type $order_type") && isset($operations['reassign'])) {
+        unset($operations['reassign']);
+    }
   }
 }
