@@ -7,6 +7,8 @@
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 
@@ -110,5 +112,38 @@ function commerce_more_tools_entity_operation_alter(array &$operations, EntityIn
     if (!\Drupal::currentUser()->hasPermission("own store reassign order type $order_type") && isset($operations['reassign'])) {
         unset($operations['reassign']);
     }
+  }
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function commerce_more_tools_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() === 'commerce_order') {
+    return [
+      'payment_state' => BaseFieldDefinition::create('list_string')
+        ->setLabel(t('Payment state'))
+        ->setDescription(t('Value to indicate about order payments status.'))
+        ->setRequired(TRUE)
+        ->setSettings([
+          'allowed_values' => [
+            'pending' => 'Payment pending',
+            'partial' => 'Partially paid',
+            'complete' => 'Complete',
+            'overpaid' => 'Overpaid',
+          ],
+        ])
+        ->setDefaultValue('pending')
+        ->setDisplayOptions('view', [
+          'label' => 'above',
+          'type' => 'string',
+        ])
+        ->setDisplayOptions('form', [
+          'region' => 'hidden',
+          'type' => 'options_select',
+        ])
+        ->setDisplayConfigurable('form', TRUE)
+        ->setDisplayConfigurable('view', TRUE),
+    ];
   }
 }

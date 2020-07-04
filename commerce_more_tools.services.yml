@@ -3,3 +3,9 @@ services:
     class: Drupal\commerce_more_tools\Routing\RouteSubscriber
     tags:
       - { name: event_subscriber } 
+
+  commerce_more_tools.payment_subscriber:
+    class: Drupal\commerce_more_tools\EventSubscriber\PaymentSubscriber
+    arguments: ['@entity_type.manager']
+    tags:
+    - { name: event_subscriber, priority: 300 }
