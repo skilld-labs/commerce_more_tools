@@ -11,6 +11,9 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\commerce_more_tools\Form\StoreForm;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 
 /**
  * Implements hook_ENTITY_TYPE_access().
@@ -146,4 +149,30 @@ function commerce_more_tools_entity_base_field_info(EntityTypeInterface $entity_
         ->setDisplayConfigurable('view', TRUE),
     ];
   }
+}
+
+/**
+ * Implements hook_entity_field_access().
+ */
+function commerce_more_tools_entity_field_access($operation, FieldDefinitionInterface $field_definition, $account, FieldItemListInterface $items = NULL) {
+  if ($field_definition->getTargetEntityTypeId() == 'commerce_store' && $field_definition->getName() == 'uid' && $items && $store = $items->getEntity()) {
+    $store_type = $store->bundle();
+    if ($operation == 'edit' && $store->getOwnerId() == $account->id() && !$account->hasPermission("own store $store_type change owner")) {
+      return AccessResult::forbidden();
+    }
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_entity_type_alter().
+ *
+ * @todo
+ *   Check if some of previous hooks may be avoided, if using an alteration here.
+ */
+function commerce_more_tools_entity_type_alter(array &$entity_types) {
+  $entity_types['commerce_store']->setFormClass('add', StoreForm::class);
+  $entity_types['commerce_store']->setFormClass('edit', StoreForm::class);
+  $entity_types['commerce_store']->setFormClass('default', StoreForm::class);
 }

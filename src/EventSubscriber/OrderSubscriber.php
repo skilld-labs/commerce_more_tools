@@ -3,11 +3,11 @@
 namespace Drupal\commerce_more_tools\EventSubscriber;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\commerce_payment\Event\PaymentEvent;
-use Drupal\commerce_payment\Event\PaymentEvents;
+use Drupal\commerce_order\Event\OrderEvent;
+use Drupal\commerce_order\Event\OrderEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PaymentSubscriber implements EventSubscriberInterface {
+class OrderSubscriber implements EventSubscriberInterface {
 
   /**
    * The entityTypeManager.
@@ -17,7 +17,7 @@ class PaymentSubscriber implements EventSubscriberInterface {
   protected $entityTypeManager;
 
   /**
-   * Constructs a new PaymentSubscriber object.
+   * Constructs a new OrderSubscriber object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entityTypeManager.
@@ -31,22 +31,21 @@ class PaymentSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     $events = [
-      PaymentEvents::PAYMENT_INSERT => 'onPaymentSaved',
-      PaymentEvents::PAYMENT_UPDATE => 'onPaymentSaved',
+      OrderEvents::ORDER_INSERT => 'onOrderSaved',
+      OrderEvents::ORDER_UPDATE => 'onOrderSaved',
     ];
 
     return $events;
   }
 
   /**
-   * Clear order cache after saving payment.
+   * Clear order cache after saving order.
    *
-   * @param \Drupal\commerce_payment\Event\PaymentEvent $event
-   *   The payment event.
+   * @param \Drupal\commerce_order\Event\OrderEvent $event
+   *   The order event.
    */
-  public function onPaymentSaved(PaymentEvent $event) {
-    $payment = $event->getPayment();
-    if ($payment && $order = $payment->getOrder()) {
+  public function onOrderSaved(OrderEvent $event) {
+    if ($order = $event->getOrder()) {
       // Clearing order cache, to avoid any mismatched value.
       $this->entityTypeManager->getStorage('commerce_order')->resetCache([$order->id()]);
       // Let's validate prices, to get proper status.

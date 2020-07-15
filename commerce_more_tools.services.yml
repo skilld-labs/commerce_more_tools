@@ -4,8 +4,8 @@ services:
     tags:
       - { name: event_subscriber } 
 
-  commerce_more_tools.payment_subscriber:
-    class: Drupal\commerce_more_tools\EventSubscriber\PaymentSubscriber
+  commerce_more_tools.order_subscriber:
+    class: Drupal\commerce_more_tools\EventSubscriber\OrderSubscriber
     arguments: ['@entity_type.manager']
     tags:
-    - { name: event_subscriber, priority: 300 }
+      - { name: event_subscriber, priority: 500 }

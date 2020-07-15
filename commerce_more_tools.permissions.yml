@@ -11,5 +11,6 @@ own store manage payments:
   description: 'Allow to manage order payments made into the own store.'
 
 permission_callbacks:
+  - \Drupal\commerce_more_tools\StoreTypePermissions::storeTypePermissions
   - \Drupal\commerce_more_tools\ProductVariationPermissions::productVariationTypePermissions
   - \Drupal\commerce_more_tools\OrderTypePermissions::orderTypePermissions
